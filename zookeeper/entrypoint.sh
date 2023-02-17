@@ -1,6 +1,6 @@
 #!/bin/bash
 # 启动SSH Daemon
-/sbin/sshd
+sudo /sbin/sshd
 
 # 初始化zookeeper
 MY_ID="$(echo "$HOSTNAME" | awk -F "-" '{print $NF}')"

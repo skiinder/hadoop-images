@@ -22,6 +22,7 @@ RUN set -ex && \
     chown -R atguigu:atguigu /opt/software /opt/module && \
     curl -L https://github.com/tsl0922/ttyd/releases/download/1.7.3/ttyd.x86_64 -o /bin/ttyd && \
     chmod +x /bin/ttyd
-
+USER atguigu
+WORKDIR /home/atguigu
 ENTRYPOINT [ "/bin/tini", "--" ]
 CMD [ "/bin/ttyd", "-o", "/bin/bash" ]
