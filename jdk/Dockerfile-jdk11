@@ -1,0 +1,7 @@
+FROM registry.cn-zhangjiakou.aliyuncs.com/atguigu-k8s/base-centos
+USER atguigu
+RUN curl -L https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.18%2B10/OpenJDK11U-jdk_x64_linux_hotspot_11.0.18_10.tar.gz | sudo tar -zx --no-same-owner && \
+    sudo mv jdk-11.0.18+10 /opt/module/java
+
+ENV JAVA_HOME=/opt/module/java
+ENV PATH=$PATH:$JAVA_HOME/bin
