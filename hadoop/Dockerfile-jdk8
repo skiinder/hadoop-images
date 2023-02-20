@@ -1,0 +1,13 @@
+FROM registry.cn-zhangjiakou.aliyuncs.com/atguigu-k8s/jdk:jdk8 as builder
+RUN curl -L https://dlcdn.apache.org/hadoop/common/hadoop-3.3.4/hadoop-3.3.4.tar.gz | sudo tar -zx --no-same-owner && \
+    sudo mv hadoop-3.3.4 /opt/module/hadoop
+COPY entrypoint.sh /opt/module/hadoop/sbin
+COPY status.sh /opt/module/hadoop/sbin
+RUN sudo chmod +x /opt/module/hadoop/sbin/entrypoint.sh
+RUN sudo chmod +x /opt/module/hadoop/sbin/status.sh
+RUN sudo chown -R atguigu:atguigu /opt/module/hadoop
+
+FROM registry.cn-zhangjiakou.aliyuncs.com/atguigu-k8s/jdk:jdk8
+COPY --from=builder --chown=atguigu:atguigu /opt/module/hadoop /opt/module/hadoop
+ENV HADOOP_HOME=/opt/module/hadoop
+CMD [ "/opt/module/hadoop/sbin/entrypoint.sh" ]
