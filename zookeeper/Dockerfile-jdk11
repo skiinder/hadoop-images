@@ -2,8 +2,10 @@ FROM registry.cn-zhangjiakou.aliyuncs.com/atguigu-k8s/jdk:jdk11 as builder
 RUN curl -L https://dlcdn.apache.org/zookeeper/zookeeper-3.7.1/apache-zookeeper-3.7.1-bin.tar.gz | sudo tar -zx --no-same-owner && \
     sudo mv apache-zookeeper-3.7.1-bin /opt/module/zookeeper
 COPY entrypoint.sh /opt/module/zookeeper/bin
-RUN sudo chmod +x /opt/module/zookeeper/bin/entrypoint.sh && \
-    sudo chown -R atguigu:atguigu /opt/module/zookeeper
+COPY status.sh /opt/module/zookeeper/bin
+RUN sudo chmod +x /opt/module/zookeeper/bin/entrypoint.sh
+RUN sudo chmod +x /opt/module/zookeeper/bin/status.sh
+RUN sudo chown -R atguigu:atguigu /opt/module/zookeeper
 
 FROM registry.cn-zhangjiakou.aliyuncs.com/atguigu-k8s/jdk:jdk11
 COPY --from=builder --chown=atguigu:atguigu /opt/module/zookeeper /opt/module/zookeeper

@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zk
+  labels:
+    app: zk
+spec:
+  selector:
+    matchLabels:
+      app: zk
+  replicas: 3
+  serviceName: 	zk-hs
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: OrderedReady
+  template:
+    metadata:
+      labels:
+        app: zk
+    spec:
+      containers:
+        - imagePullPolicy: Always
+          name: zookeeper
+          volumeMounts:
+            - name: config
+              mountPath: /opt/module/zookeeper/conf/zoo.cfg
+              subPath: zoo.cfg
+            - name: data
+              mountPath: /opt/data/zookeeper
+          image: registry.cn-zhangjiakou.aliyuncs.com/atguigu-k8s/zookeeper:jdk8
+          ports:
+            - containerPort: 2181
+              name: client
+            - containerPort: 2888
+              name: server
+            - containerPort: 3888
+              name: leader-election
+          workingDir: /opt/module/zookeeper
+          readinessProbe:
+            exec:
+              command:
+                - /opt/module/zookeeper/bin/status.sh
+            failureThreshold: 3
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
+          livenessProbe:
+            exec:
+              command:
+                - /opt/module/zookeeper/bin/status.sh
+            failureThreshold: 3
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
+      imagePullSecrets:
+        - name: aliyun-internal
+      restartPolicy: Always
+      serviceAccount: default
+      serviceAccountName: default
+      volumes:
+        - configMap:
+            defaultMode: 420
+            name: zookeeper
+          name: config
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteMany
+        storageClassName: juicefs-sc
+        resources:
+          requests:
+            storage: 8Gi
